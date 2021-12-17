@@ -21,6 +21,14 @@
 
 #include "grbl.h"
 
+#include "report.h"
+#include "planner.h"
+#include "limits.h"
+#include "protocol.h"
+#include "stepper.h"
+
+#include "motion_control.h"
+
 
 // Homing axis search distance multiplier. Computed by this value times the cycle travel.
 #ifndef HOMING_AXIS_SEARCH_SCALAR

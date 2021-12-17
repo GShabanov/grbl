@@ -21,6 +21,14 @@
 
 #include "grbl.h"
 
+#include "stepper.h"
+#include "gcode.h"
+#include "planner.h"
+#include "probe.h"
+
+#include "spindle_control.h"
+//#include "coolant_control.h"
+
 
 // Some useful constants.
 #define DT_SEGMENT (1.0/(ACCELERATION_TICKS_PER_SECOND*60.0)) // min/segment

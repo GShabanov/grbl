@@ -20,6 +20,15 @@
 */
 
 #include "grbl.h"
+#include "settings.h"
+
+#include "protocol.h"
+#include "report.h"
+#include "eeprom.h"
+#include "stepper.h"
+#include "probe.h"
+#include "limits.h"
+#include "spindle_control.h"
 
 settings_t settings;
 

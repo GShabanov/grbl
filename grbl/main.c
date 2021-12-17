@@ -21,6 +21,17 @@
 
 #include "grbl.h"
 
+#include "gcode.h"
+#include "planner.h"
+#include "protocol.h"
+#include "report.h"
+
+#include "serial.h"
+#include "stepper.h"
+#include "limits.h"
+#include "probe.h"
+#include "spindle_control.h"
+#include "coolant_control.h"
 
 // Declare system global variable structure
 system_t sys;

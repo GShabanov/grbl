@@ -45,21 +45,11 @@
 #include "system.h"
 #include "defaults.h"
 #include "cpu_map.h"
-#include "planner.h"
-#include "coolant_control.h"
-#include "eeprom.h"
-#include "gcode.h"
-#include "limits.h"
-#include "motion_control.h"
-#include "planner.h"
-#include "print.h"
-#include "probe.h"
-#include "protocol.h"
-#include "report.h"
-#include "serial.h"
-#include "spindle_control.h"
-#include "stepper.h"
-#include "jog.h"
+
+#ifndef _NOP
+#define _NOP()  __asm__ __volatile__ ("nop" ::)
+//#define _NOP() do { __asm__ volatile ("nop"); } while (0)
+#endif
 
 // ---------------------------------------------------------------------------------------
 // COMPILE-TIME ERROR CHECKING OF DEFINE VALUES:

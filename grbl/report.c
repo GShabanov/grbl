@@ -28,6 +28,17 @@
 
 #include "grbl.h"
 
+#include "gcode.h"
+#include "planner.h"
+#include "serial.h"
+#include "stepper.h"
+#include "report.h"
+#include "print.h"
+#include "limits.h"
+#include "probe.h"
+
+#include "spindle_control.h"
+#include "coolant_control.h"
 
 // Internal report utilities to reduce flash with repetitive tasks turned into functions.
 void report_util_setting_prefix(uint8_t n) { serial_write('$'); print_uint8_base10(n); serial_write('='); }
@@ -182,44 +193,48 @@ void report_grbl_help() {
 // NOTE: The numbering scheme here must correlate to storing in settings.c
 void report_grbl_settings() {
   // Print Grbl settings.
-  report_util_uint8_setting(0,settings.pulse_microseconds);
-  report_util_uint8_setting(1,settings.stepper_idle_lock_time);
-  report_util_uint8_setting(2,settings.step_invert_mask);
-  report_util_uint8_setting(3,settings.dir_invert_mask);
-  report_util_uint8_setting(4,bit_istrue(settings.flags,BITFLAG_INVERT_ST_ENABLE));
-  report_util_uint8_setting(5,bit_istrue(settings.flags,BITFLAG_INVERT_LIMIT_PINS));
-  report_util_uint8_setting(6,bit_istrue(settings.flags,BITFLAG_INVERT_PROBE_PIN));
-  report_util_uint8_setting(10,settings.status_report_mask);
-  report_util_float_setting(11,settings.junction_deviation,N_DECIMAL_SETTINGVALUE);
-  report_util_float_setting(12,settings.arc_tolerance,N_DECIMAL_SETTINGVALUE);
-  report_util_uint8_setting(13,bit_istrue(settings.flags,BITFLAG_REPORT_INCHES));
-  report_util_uint8_setting(20,bit_istrue(settings.flags,BITFLAG_SOFT_LIMIT_ENABLE));
-  report_util_uint8_setting(21,bit_istrue(settings.flags,BITFLAG_HARD_LIMIT_ENABLE));
-  report_util_uint8_setting(22,bit_istrue(settings.flags,BITFLAG_HOMING_ENABLE));
-  report_util_uint8_setting(23,settings.homing_dir_mask);
-  report_util_float_setting(24,settings.homing_feed_rate,N_DECIMAL_SETTINGVALUE);
-  report_util_float_setting(25,settings.homing_seek_rate,N_DECIMAL_SETTINGVALUE);
-  report_util_uint8_setting(26,settings.homing_debounce_delay);
-  report_util_float_setting(27,settings.homing_pulloff,N_DECIMAL_SETTINGVALUE);
-  report_util_float_setting(30,settings.rpm_max,N_DECIMAL_RPMVALUE);
-  report_util_float_setting(31,settings.rpm_min,N_DECIMAL_RPMVALUE);
+  report_util_uint8_setting(0,  settings.pulse_microseconds);  // 10
+  report_util_uint8_setting(1,  settings.stepper_idle_lock_time); // 25
+  report_util_uint8_setting(2,  settings.step_invert_mask);       // 0
+  report_util_uint8_setting(3,  settings.dir_invert_mask);        // 6
+  report_util_uint8_setting(4,  bit_istrue(settings.flags,BITFLAG_INVERT_ST_ENABLE));  // 0
+  report_util_uint8_setting(5,  bit_istrue(settings.flags,BITFLAG_INVERT_LIMIT_PINS)); // 0
+  report_util_uint8_setting(6,  bit_istrue(settings.flags,BITFLAG_INVERT_PROBE_PIN));  // 0
+  report_util_uint8_setting(10, settings.status_report_mask);                         // 1
+  report_util_float_setting(11, settings.junction_deviation,N_DECIMAL_SETTINGVALUE);  // 1.000
+  report_util_float_setting(12, settings.arc_tolerance,N_DECIMAL_SETTINGVALUE);       // 0.002
+  report_util_uint8_setting(13, bit_istrue(settings.flags,BITFLAG_REPORT_INCHES));    // 0
+  report_util_uint8_setting(20, bit_istrue(settings.flags,BITFLAG_SOFT_LIMIT_ENABLE)); // 0
+  report_util_uint8_setting(21, bit_istrue(settings.flags,BITFLAG_HARD_LIMIT_ENABLE)); // 1
+  report_util_uint8_setting(22, bit_istrue(settings.flags,BITFLAG_HOMING_ENABLE));     // 1
+  report_util_uint8_setting(23, settings.homing_dir_mask);                             // 7
+  report_util_float_setting(24, settings.homing_feed_rate,N_DECIMAL_SETTINGVALUE);     // 25.000
+  report_util_float_setting(25, settings.homing_seek_rate,N_DECIMAL_SETTINGVALUE);     // 500.000
+  report_util_uint8_setting(26, settings.homing_debounce_delay);                       // 250
+  report_util_float_setting(27, settings.homing_pulloff,N_DECIMAL_SETTINGVALUE);       // 2.000
+  report_util_float_setting(30, settings.rpm_max,N_DECIMAL_RPMVALUE);                  // 10000.0
+  report_util_float_setting(31, settings.rpm_min,N_DECIMAL_RPMVALUE);                  // 0
   #ifdef VARIABLE_SPINDLE
-    report_util_uint8_setting(32,bit_istrue(settings.flags,BITFLAG_LASER_MODE));
+    report_util_uint8_setting(32,bit_istrue(settings.flags,BITFLAG_LASER_MODE));      // 0
   #else
     report_util_uint8_setting(32,0);
   #endif
   // Print axis settings
   uint8_t idx, set_idx;
   uint8_t val = AXIS_SETTINGS_START_VAL;
+
   for (set_idx=0; set_idx<AXIS_N_SETTINGS; set_idx++) {
-    for (idx=0; idx<N_AXIS; idx++) {
+
+      for (idx=0; idx<N_AXIS; idx++) {
+
       switch (set_idx) {
-        case 0: report_util_float_setting(val+idx,settings.steps_per_mm[idx],N_DECIMAL_SETTINGVALUE); break;
-        case 1: report_util_float_setting(val+idx,settings.max_rate[idx],N_DECIMAL_SETTINGVALUE); break;
+        case 0: report_util_float_setting(val+idx,settings.steps_per_mm[idx],N_DECIMAL_SETTINGVALUE); break;     // 800
+        case 1: report_util_float_setting(val+idx,settings.max_rate[idx],N_DECIMAL_SETTINGVALUE); break;         // 
         case 2: report_util_float_setting(val+idx,settings.acceleration[idx]/(60*60),N_DECIMAL_SETTINGVALUE); break;
         case 3: report_util_float_setting(val+idx,-settings.max_travel[idx],N_DECIMAL_SETTINGVALUE); break;
       }
     }
+
     val += AXIS_SETTINGS_INCREMENT;
   }
 }

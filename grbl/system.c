@@ -20,6 +20,14 @@
 
 #include "grbl.h"
 
+#include "system.h"
+
+#include "gcode.h"
+#include "planner.h"
+#include "motion_control.h"
+#include "report.h"
+#include "protocol.h"
+#include "stepper.h"
 
 void system_init()
 {

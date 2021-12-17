@@ -22,6 +22,18 @@
 #include "grbl.h"
 
 
+#include "gcode.h"
+#include "planner.h"
+#include "protocol.h"
+#include "report.h"
+#include "limits.h"
+#include "probe.h"
+#include "planner.h"
+#include "stepper.h"
+#include "motion_control.h"
+#include "spindle_control.h"
+#include "coolant_control.h"
+
 // Execute linear motion in absolute millimeter coordinates. Feed rate given in millimeters/second
 // unless invert_feed_rate is true. Then the feed_rate means that the motion should be completed in
 // (1 minute)/feed_rate time.

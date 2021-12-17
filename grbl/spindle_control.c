@@ -21,6 +21,11 @@
 
 #include "grbl.h"
 
+#include "protocol.h"
+#include "planner.h"
+#include "gcode.h"
+
+#include "spindle_control.h"
 
 #ifdef VARIABLE_SPINDLE
   static float pwm_gradient; // Precalulated value to speed up rpm to PWM conversions.

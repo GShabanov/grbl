@@ -21,6 +21,19 @@
 
 #include "grbl.h"
 
+
+#include "gcode.h"
+#include "report.h"
+#include "planner.h"
+#include "protocol.h"
+#include "stepper.h"
+
+#include "serial.h"
+#include "limits.h"
+#include "spindle_control.h"
+#include "coolant_control.h"
+
+
 // Define line flags. Includes comment type tracking and line overflow detection.
 #define LINE_FLAG_OVERFLOW bit(0)
 #define LINE_FLAG_COMMENT_PARENTHESES bit(1)

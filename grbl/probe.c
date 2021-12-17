@@ -20,6 +20,7 @@
 
 #include "grbl.h"
 
+#include "probe.h"
 
 // Inverts the probe pin state depending on user settings and probing cycle mode.
 uint8_t probe_invert_mask;

@@ -20,7 +20,9 @@
 */
 
 #include "grbl.h"
+#include "print.h"
 
+#include "serial.h"
 
 void printString(const char *s)
 {

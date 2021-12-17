@@ -19,6 +19,10 @@
 */
 
 #include "grbl.h"
+#include "gcode.h"
+#include "planner.h"
+#include "protocol.h"
+#include "coolant_control.h"
 
 
 void coolant_init()
